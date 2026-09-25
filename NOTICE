@@ -1,0 +1,77 @@
+RAZOR: Pruning Replaceable Experts in LLMs
+Copyright 2026 Mingyang Song, Mao Zheng
+
+This product includes software developed by the RAZOR authors, licensed under
+the Apache License, Version 2.0 (see LICENSE).
+
+================================================================================
+Third-party software
+================================================================================
+
+REAP  (vendored under third_party/reap/)
+    Licensed under the Apache License, Version 2.0.
+    Copyright Cerebras Systems.
+    Upstream: https://github.com/CerebrasResearch/reap
+    Snapshot: 1970473c51ca3caeb98c10392f15b3a08a672974
+    Full license text: third_party/reap/LICENSE
+    Upstream README: third_party/reap/README-upstream.md
+
+    Included unchanged as a reference implementation; only a source subset is
+    vendored and the Python package does not import or distribute it.
+
+REAM
+    NOT vendored in this repository. REAM is distributed by Samsung under the
+    MIT License. If you wish to compare against it, install it separately from
+    its upstream source.
+
+================================================================================
+Dataset attribution (data/)
+================================================================================
+
+RazorCal records remain subject to their applicable upstream terms. The
+following attribution is retained from the recorded source information;
+record-level provenance and license applicability are not fully established
+for this release. See data/LICENSE-DATA and data/FIDELITY_AUDIT.md.
+
+Recorded upstream attribution:
+
+    Nemotron-Post-Training-Dataset-v1 / v2 / v3   (NVIDIA)
+        CC-BY-4.0  https://creativecommons.org/licenses/by/4.0/
+        Verify the applicable source release and slice.
+
+    Nemotron-SFT-OpenCode-V1                      (NVIDIA)
+        CC-BY-4.0
+        Domain: general coding
+
+    smoltalk2                                     (HuggingFaceTB)
+        ODC-BY-1.0 https://opendatacommons.org/licenses/by/1-0/
+        plus the licenses of its own upstream slices
+        Includes the recorded OpenHermes-2.5 attribution.
+
+    OpenHermes-2.5                                (Teknium)
+        See the collection's individual source licenses.
+        Domain: world knowledge
+
+    tulu-3-sft-personas-instruction-following     (Allen AI)
+        ODC-BY-1.0
+        Mapping to included records is not established here.
+
+    Dolci-Precise-IF / Dolci-Python-Algorithms
+        Recorded source labels for instruction-following and coding records.
+        Exact source releases and terms remain to be verified.
+
+    Nemotron-Cascade-2-SFT-Data / math           (NVIDIA)
+        CC-BY-4.0 was recorded. Source of the 160 records labeled
+        nemotron-cascade2-math. The math slice was taken whole rather than
+        sampled per record, so mapping to individual upstream records is not
+        established. See data/README.md for the source-label inventory.
+
+The sub_source field retains recorded attribution, not proof of complete
+record-level provenance. See data/FIDELITY_AUDIT.md for the current status.
+
+================================================================================
+Models
+================================================================================
+
+Base-model weights are not redistributed here. Obtain them from their
+respective providers under their own licenses.

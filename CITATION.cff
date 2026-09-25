@@ -1,0 +1,68 @@
+cff-version: 1.2.0
+message: >
+  Please cite this software when using RAZOR. When using the calibration
+  data, also cite RazorCal and retain applicable upstream attribution.
+title: "RAZOR: Pruning Replaceable Experts in LLMs"
+type: software
+authors:
+  - given-names: Mingyang
+    family-names: Song
+    email: nickmysong@tencent.com
+    affiliation: "Foundation Model Department, Tencent"
+  - given-names: Mao
+    family-names: Zheng
+    affiliation: "Foundation Model Department, Tencent"
+repository-code: "https://github.com/nick7nlp/Razor"
+url: "https://github.com/nick7nlp/Razor"
+license: Apache-2.0
+license-url: "https://www.apache.org/licenses/LICENSE-2.0"
+identifiers:
+  - type: url
+    value: "https://arxiv.org/abs/2609.30465"
+    description: "arXiv:2609.30465 -- the preprint describing RAZOR"
+  - type: url
+    value: "https://huggingface.co/collections/Nickyang/razor"
+    description: Hugging Face collection of the released pruned models
+abstract: >
+  RAZOR is a training-free expert pruning method for mixture-of-experts
+  models. It scores functional replaceability with consensus residuals, using
+  an exact single-deletion identity that accounts for survivor renormalization
+  and router-selected refill, and aggregates the scores by conditional RMS over
+  calibration tokens. The repository provides RAZOR, its RCS and RCS-LOO
+  scoring variants, the REAP, EAN and frequency baselines, model adapters and
+  the RazorCal calibration corpus.
+keywords:
+  - mixture-of-experts
+  - model-compression
+  - pruning
+  - counterfactual-saliency
+  - calibration-dataset
+preferred-citation:
+  type: article
+  title: "RAZOR: Pruning Replaceable Experts in LLMs"
+  authors:
+    - given-names: Mingyang
+      family-names: Song
+      email: nickmysong@tencent.com
+      affiliation: "Foundation Model Department, Tencent"
+    - given-names: Mao
+      family-names: Zheng
+      affiliation: "Foundation Model Department, Tencent"
+  year: 2026
+  journal: "arXiv preprint arXiv:2609.30465"
+  url: "https://arxiv.org/abs/2609.30465"
+  identifiers:
+    - type: url
+      value: "https://arxiv.org/abs/2609.30465"
+      description: "arXiv:2609.30465"
+references:
+  - type: data
+    title: "RazorCal: A Compact, Diverse Calibration Corpus for Model Compression"
+    authors:
+      - name: "RazorCal Contributors"
+    abstract: >
+      A 2,048-sample, 7-domain calibration corpus released with RAZOR. The
+      records carry no architecture-specific fields and suit expert, FFN or
+      layer pruning as well as other calibration-based compression. Records
+      remain subject to their applicable upstream terms; see data/LICENSE-DATA
+      for recorded license information.

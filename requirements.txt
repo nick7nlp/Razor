@@ -1,0 +1,10 @@
+# Core: saliency collection and pruning
+torch>=2.4
+transformers>=5.8.1,<6
+safetensors>=0.4
+accelerate>=0.30
+numpy>=1.24
+
+# tokenizer + calibration data handling
+sentencepiece
+tqdm

@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "razor-moe"
+version = "0.1.0"
+description = "RAZOR: Pruning Replaceable Experts in LLMs"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+authors = [
+    { name = "Mingyang Song", email = "nickmysong@tencent.com" },
+    { name = "Mao Zheng" },
+]
+keywords = [
+    "moe",
+    "mixture-of-experts",
+    "expert-pruning",
+    "pruning",
+    "model-compression",
+    "llm",
+    "training-free",
+    "calibration-dataset",
+]
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "torch>=2.4",
+    "transformers>=5.8.1,<6",
+    "safetensors>=0.4",
+    "accelerate>=0.30",
+    "numpy>=1.24",
+    "sentencepiece",
+    "tqdm",
+]
+
+[project.optional-dependencies]
+# regenerating the RazorCal analysis figures
+figures = ["matplotlib>=3.7"]
+# loading calibration sets straight from the Hugging Face hub (hf:<id>)
+hub = ["datasets>=2.14"]
+kimi = ["fla-core>=0.5.1,<0.6", "einops>=0.8"]
+
+[project.scripts]
+razor = "razor.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/nick7nlp/Razor"
+Repository = "https://github.com/nick7nlp/Razor"
+Paper = "https://arxiv.org/abs/2609.30465"
+Models = "https://huggingface.co/collections/Nickyang/razor"
+
+[tool.setuptools.packages.find]
+# only the method package; data/, scripts/ and third_party/ are not importable
+include = ["razor*"]
+exclude = ["third_party*", "data*", "examples*", "scripts*", "assets*", "docs*"]

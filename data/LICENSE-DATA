@@ -1,0 +1,45 @@
+# RazorCal source licenses and attribution
+
+RazorCal contains records attributed to multiple upstream corpora. Applicable
+upstream terms remain in effect; this file does not grant a new dataset-wide
+license or establish redistribution rights for every record.
+
+## Recorded license information
+
+The following information is retained from the dataset documentation. Exact
+source releases, record mappings and applicable terms require review against
+the upstream materials before redistribution.
+
+| Recorded source | Attribution | Recorded terms / status |
+|---|---|---|
+| Nemotron-Post-Training-Dataset-v1 / v2 / v3 and Nemotron source slices | NVIDIA | CC-BY-4.0 was recorded; verify the specific source release and slice |
+| Nemotron-SFT-OpenCode-V1 | NVIDIA | CC-BY-4.0 was recorded; verify the specific source release |
+| smoltalk2 | HuggingFaceTB | ODC-BY-1.0 plus the terms of its upstream slices |
+| OpenHermes-2.5 | Teknium | Consult the collection and its individual source terms; no uniform license is asserted here |
+| tulu-3-sft-personas-instruction-following | Allen AI | ODC-BY-1.0; mapping to included records is not established here |
+| Dolci-Precise-IF / Dolci-Python-Algorithms | Dolci source labels | Recorded terms: CC-BY-4.0; the exact source releases and terms remain to be verified |
+| Nemotron-Cascade-2-SFT-Data / math | NVIDIA | CC-BY-4.0 was recorded; the slice was taken whole, so per-record mapping within it is not established |
+
+The source-label inventory is in [README.md](README.md). A `sub_source`
+label is attribution metadata, not sufficient evidence of a source license.
+See [FIDELITY_AUDIT.md](FIDELITY_AUDIT.md) for provenance status.
+
+## Use and redistribution
+
+Retain source labels and applicable attribution notices. Before using or
+redistributing records, review their upstream terms and resolve any missing
+source mapping or permission information. This document does not certify
+compatibility among the listed terms.
+
+Project script licenses are separate from dataset terms; see [LICENSE-CODE](LICENSE-CODE)
+and the project [LICENSE](../LICENSE). Citation metadata is in
+[CITATION.cff](../CITATION.cff); third-party attribution is in [NOTICE](../NOTICE).
+
+## References
+
+- NVIDIA Nemotron-Post-Training-Dataset-v1:
+  https://huggingface.co/datasets/nvidia/Nemotron-Post-Training-Dataset-v1
+- HuggingFaceTB smoltalk2:
+  https://huggingface.co/datasets/HuggingFaceTB/smoltalk2
+- CC-BY-4.0: https://creativecommons.org/licenses/by/4.0/
+- ODC-BY-1.0: https://opendatacommons.org/licenses/by/1-0/

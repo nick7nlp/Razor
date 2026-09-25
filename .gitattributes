@@ -1,0 +1,2 @@
+# Store the calibration corpus with Git LFS.
+data/RazorCal.json filter=lfs diff=lfs merge=lfs -text
