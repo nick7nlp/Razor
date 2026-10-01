@@ -1,7 +1,7 @@
 # RAZOR: Pruning Replaceable Experts in LLMs
 
 [![Paper](https://img.shields.io/badge/arXiv-2609.30465-b31b1b.svg)](https://arxiv.org/abs/2609.30465)
-[![Models](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Models-yellow)](https://huggingface.co/collections/Nickyang/razor)
+[![Models](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Models-yellow)](https://huggingface.co/collections/Nickyang/razor-6aa50e30536927640b6572f8)
 [![Dataset](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-RazorCal-yellow)](https://huggingface.co/datasets/Nickyang/RazorCal)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
@@ -11,6 +11,22 @@ determine the damage caused by its removal; what matters is whether the
 surviving computation can replace its function. RAZOR scores this functional
 replaceability with *consensus residuals*: deviations of expert outputs from
 the original weighted mixture.
+
+## News
+
+- **2026-09-30:** Released Qwen3.8-Flash-Next **RAZOR** checkpoints at **25%** and
+  **50%** expert removal: [96B-A6B](https://huggingface.co/Nickyang/Qwen3.8-Flash-Next-RAZOR-96B-A6B-E384of512)
+  and [65B-A6B](https://huggingface.co/Nickyang/Qwen3.8-Flash-Next-RAZOR-65B-A6B-E256of512).
+  Names count the main language model; n-gram, MTP and vision weights remain
+  included in the downloads. See [Released models](#released-models) for the
+  full parameter breakdown and calibration scope.
+- **2026-09-30:** Added native Qwen3.8 support, tested with Transformers 5.16.1,
+  including conditional-model loading, CPU n-gram placement and MTP-preserving
+  export. Standardized the [model collection](https://huggingface.co/collections/Nickyang/razor-6aa50e30536927640b6572f8)
+  on **RAZOR** naming; corrected GLM MTP parameter descriptions and synchronized
+  the official Gemma tool-call template fixes. See [compatibility and validation scope](docs/models.md).
+
+## Method overview
 
 ![Replaceability depends on output geometry and router refill](assets/razor_intuition.png)
 
@@ -40,8 +56,13 @@ No gradients or recovery training are used.
 
 Requires Python 3.10+, PyTorch 2.4+ and Transformers 5.8.1 or later in the
 5.x series. Select a Transformers build containing your model's native
-implementation; GLM-5.3 requires a newer model definition.
-Kimi's native linear-attention path also requires its model-specific kernels.
+implementation; GLM-5.3 and Qwen3.8 Flash Next require newer model definitions.
+Qwen3.8 uses the `qwen4_exp` architecture declared in the
+[official checkpoint config](https://huggingface.co/Qwen/Qwen3.8-Flash-Next/blob/main/config.json),
+not `qwen3_next`. Its native implementation is available in the official
+[Transformers 5.16.1 release](https://pypi.org/project/transformers/5.16.1/),
+which is the version tested here. Kimi's native linear-attention path also
+requires its model-specific kernels.
 
 ```bash
 pip install -e .
@@ -125,6 +146,7 @@ checkpoint layouts. `razor models` lists accepted configuration types.
 | GLM-4.7-Flash / GLM-5.2 | Native MoE / DSA model, layer streaming and paired expert/router pruning |
 | GLM-5.3 | Text/conditional wrapper, native layer streaming and FP8 weight/scale export |
 | Qwen3.5 / Qwen3.6 MoE | Text/conditional wrappers, fused experts and shared-expert preservation |
+| Qwen3.8 Flash Next | Native `qwen4_exp`, fused experts, HC/PLE/QSA, CPU n-gram placement and MTP-preserving raw export |
 | Gemma 4 MoE | Decoder-level router, separate expert input normalization and per-expert gain |
 | Kimi K3 / Kimi Linear | Latent MoE, native expert activation and packed weight/scale preservation |
 
@@ -157,32 +179,48 @@ full-size weights or downstream task quality.
 
 ## Released models
 
-Pruned checkpoints produced with `--method razor`, calibrated on 32,768-token
-rows of RazorCal. Each repository carries the `kept_expert_indices.json`
-manifest it was built from, so `razor verify` runs against it directly.
+Pruned checkpoints produced with `--method razor`, using 32,768-token
+calibration rows. Each repository carries the `kept_expert_indices.json`
+manifest it was built from; verification requires a Razor version supporting
+the model's native architecture. Qwen3.8 reuses historical `MoECal_v2.5`
+statistics, not a fresh collection on the current public RazorCal; its model
+cards and `calibration_info.json` state the exact calibration scope.
 
 | Backbone | Model | Experts | Removed | Parameters | Active |
 |---|---|---|---|---|---|
-| GLM-4.7-Flash | [Razor-24B-A3B-E48of64](https://huggingface.co/Nickyang/GLM-4.7-Flash-Razor-24B-A3B-E48of64) | 48 of 64 | 25% | 24.1B | ~3B |
-| GLM-4.7-Flash | [Razor-17B-A3B-E32of64](https://huggingface.co/Nickyang/GLM-4.7-Flash-Razor-17B-A3B-E32of64) | 32 of 64 | 50% | 17.0B | ~3B |
-| Qwen3.6-35B-A3B | [Razor-28B-A3B-E192of256](https://huggingface.co/Nickyang/Qwen3.6-35B-A3B-Razor-28B-A3B-E192of256) | 192 of 256 | 25% | 27.7B | ~3B |
-| Qwen3.6-35B-A3B | [Razor-19B-A3B-E128of256](https://huggingface.co/Nickyang/Qwen3.6-35B-A3B-Razor-19B-A3B-E128of256) | 128 of 256 | 50% | 19.4B | ~3B |
-| DeepSeek-V4-Flash-0731 | [Razor-230B-A13B-E192of256](https://huggingface.co/Nickyang/DeepSeek-V4-Flash-0731-Razor-230B-A13B-E192of256) | 192 of 256 | 25% | 230B | ~13B |
-| DeepSeek-V4-Flash-0731 | [Razor-156B-A13B-E128of256](https://huggingface.co/Nickyang/DeepSeek-V4-Flash-0731-Razor-156B-A13B-E128of256) | 128 of 256 | 50% | 156B | ~13B |
-| Hy3 | [Razor-226B-A21B-E144of192](https://huggingface.co/Nickyang/Hy3-Razor-226B-A21B-E144of192) | 144 of 192 | 25% | 226B | ~21B |
-| Hy3 | [Razor-154B-A21B-E96of192](https://huggingface.co/Nickyang/Hy3-Razor-154B-A21B-E96of192) | 96 of 192 | 50% | 154B | ~21B |
-| Gemma-4-26B-A4B-it | [Razor-20B-A4B-E96of128](https://huggingface.co/Nickyang/Gemma-4-26B-A4B-it-Razor-20B-A4B-E96of128) | 96 of 128 | 25% | 20.1B | ~4B |
-| Gemma-4-26B-A4B-it | [Razor-14B-A4B-E64of128](https://huggingface.co/Nickyang/Gemma-4-26B-A4B-it-Razor-14B-A4B-E64of128) | 64 of 128 | 50% | 14.4B | ~4B |
+| GLM-4.7-Flash | [RAZOR-24B-A3B-E48of64](https://huggingface.co/Nickyang/GLM-4.7-Flash-RAZOR-24B-A3B-E48of64) | 48 of 64 | 25% | 24.1B | ~3B |
+| GLM-4.7-Flash | [RAZOR-17B-A3B-E32of64](https://huggingface.co/Nickyang/GLM-4.7-Flash-RAZOR-17B-A3B-E32of64) | 32 of 64 | 50% | 17.0B | ~3B |
+| Qwen3.6-35B-A3B | [RAZOR-28B-A3B-E192of256](https://huggingface.co/Nickyang/Qwen3.6-35B-A3B-RAZOR-28B-A3B-E192of256) | 192 of 256 | 25% | 27.7B | ~3B |
+| Qwen3.6-35B-A3B | [RAZOR-19B-A3B-E128of256](https://huggingface.co/Nickyang/Qwen3.6-35B-A3B-RAZOR-19B-A3B-E128of256) | 128 of 256 | 50% | 19.4B | ~3B |
+| DeepSeek-V4-Flash-0731 | [RAZOR-230B-A13B-E192of256](https://huggingface.co/Nickyang/DeepSeek-V4-Flash-0731-RAZOR-230B-A13B-E192of256) | 192 of 256 | 25% | 230B | ~13B |
+| DeepSeek-V4-Flash-0731 | [RAZOR-156B-A13B-E128of256](https://huggingface.co/Nickyang/DeepSeek-V4-Flash-0731-RAZOR-156B-A13B-E128of256) | 128 of 256 | 50% | 156B | ~13B |
+| Hy3 | [RAZOR-226B-A21B-E144of192](https://huggingface.co/Nickyang/Hy3-RAZOR-226B-A21B-E144of192) | 144 of 192 | 25% | 226B | ~21B |
+| Hy3 | [RAZOR-154B-A21B-E96of192](https://huggingface.co/Nickyang/Hy3-RAZOR-154B-A21B-E96of192) | 96 of 192 | 50% | 154B | ~21B |
+| Gemma-4-26B-A4B-it | [RAZOR-20B-A4B-E96of128](https://huggingface.co/Nickyang/Gemma-4-26B-A4B-it-RAZOR-20B-A4B-E96of128) | 96 of 128 | 25% | 20.1B | ~4B |
+| Gemma-4-26B-A4B-it | [RAZOR-14B-A4B-E64of128](https://huggingface.co/Nickyang/Gemma-4-26B-A4B-it-RAZOR-14B-A4B-E64of128) | 64 of 128 | 50% | 14.4B | ~4B |
+| Qwen3.8-Flash-Next | [RAZOR-96B-A6B-E384of512](https://huggingface.co/Nickyang/Qwen3.8-Flash-Next-RAZOR-96B-A6B-E384of512) | 384 of 512 | 25% | 95.529B main model | ~6B |
+| Qwen3.8-Flash-Next | [RAZOR-65B-A6B-E256of512](https://huggingface.co/Nickyang/Qwen3.8-Flash-Next-RAZOR-65B-A6B-E256of512) | 256 of 512 | 50% | 65.314B main model | ~6B |
 
-Parameter counts include the MTP module, whose own expert pool is pruned to the
-same budget. Active parameters are reported on each base model's own scale: pruning shrinks
-the expert pool but not the per-token compute, because top-$k$ and the shared
-experts are preserved.
-DeepSeek-V4-Flash stores its routed experts in MXFP4, and its counts account
-for the 4-bit packing. Gemma 4 is multimodal: its vision tower is left intact
-and the text-only calibration corpus does not exercise image conditioning.
-Each model inherits its base model's license: MIT for GLM-4.7-Flash and
-DeepSeek-V4-Flash, Apache-2.0 for Qwen3.6, Hy3 and Gemma 4.
+For the first five backbones, parameter counts include stored MTP modules,
+whose expert pools are pruned to the same budget. Qwen3.8 names and the two
+main-model values instead exclude n-gram tables, MTP and vision, separating
+these components as the official model card does:
+
+| Qwen3.8 budget | Main language model | N-gram tables (unchanged) | Stored MTP | Vision (unchanged) | Full stored total |
+|---|---|---|---|---|---|
+| 25% removed | 95.529B | 51.200B | 1.978B | 0.449B | 149.156B |
+| 50% removed | 65.314B | 51.200B | 1.348B | 0.449B | 118.312B |
+
+N-gram weights remain in both downloads. HF's automatic parameter badge counts
+the complete checkpoint, not just the language-model naming scope. Exact
+component counts are in the model cards and `release_info.json`.
+Active parameters follow each official base model's convention; top-$k$ and
+shared experts are preserved, but this is not a new FLOP or throughput measurement.
+DeepSeek-V4-Flash stores routed experts in MXFP4; its counts account for 4-bit
+packing. Vision weights are left intact; text calibration is not a multimodal
+quality evaluation. Each model retains its base license: MIT for GLM-4.7-Flash
+and DeepSeek-V4-Flash; Apache-2.0 for Qwen3.6, Hy3 and Gemma 4;
+Qwen Community License 1.0 for Qwen3.8-Flash-Next.
 Selection depends on the calibration draw, so an independent run reproduces the
 procedure rather than these exact expert sets.
 

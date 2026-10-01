@@ -40,7 +40,7 @@ def _checkpoint(root, family, *, quantized=False, mtp=False, hash_layer=False):
         config["mlp_layer_types"] = ["hash_moe", "moe"]
     if mtp:
         config["num_nextn_predict_layers"] = 1
-    wrapped = family in ("qwen3_5_moe", "qwen3_6_moe", "glm5_next", "gemma4", "kimi_k3")
+    wrapped = family in ("qwen3_5_moe", "qwen3_6_moe", "qwen4_exp", "glm5_next", "gemma4", "kimi_k3")
     raw = {"model_type": family, "text_config": config} if wrapped else config
     (root / "config.json").write_text(json.dumps(raw))
     values = {"embed.weight": torch.tensor([float("nan"), -0.0, 2.0]), "dense.weight": torch.arange(12).reshape(3, 4).float()}
@@ -61,7 +61,7 @@ def _checkpoint(root, family, *, quantized=False, mtp=False, hash_layer=False):
         values[f"{prefix}.{block}.gate.e_score_correction_bias"] = torch.arange(count).float()
     elif family == "deepseek_v4":
         values[f"{prefix}.ffn.gate.bias"] = torch.arange(count).float()
-    fused = family in ("gemma4", "qwen3_5_moe", "qwen3_6_moe", "qwen3_moe")
+    fused = family in ("gemma4", "qwen3_5_moe", "qwen3_6_moe", "qwen4_exp", "qwen3_moe")
     if fused:
         expert_prefix = f"{prefix}.experts" if family == "gemma4" else f"{prefix}.mlp.experts"
         for role in ("gate_up_proj", "down_proj"):

@@ -24,7 +24,7 @@ _CACHE_SCHEMA = 1
 _CHECKPOINT_TYPES = frozenset({
     "hy_v3", "deepseek_v4", "deepseek_v4_mixed", "glm_moe_dsa", "glm4_moe_lite",
     "glm5_next", "glm5_next_text", "qwen3_5_moe", "qwen3_5_moe_text",
-    "qwen3_6_moe", "qwen3_6_moe_text",
+    "qwen3_6_moe", "qwen3_6_moe_text", "qwen4_exp", "qwen4_exp_text",
     "gemma4", "gemma4_text", "kimi_k3", "kimi_linear",
 })
 
@@ -56,6 +56,13 @@ def _storage_metadata(model, export_mode):
     if export_mode not in ("auto", "checkpoint", "model"):
         raise ValueError("export_mode must be auto, checkpoint or model")
     if export_mode == "model":
+        config = _raw_config(model)
+        text = config.get("text_config") or config
+        if {config.get("model_type"), text.get("model_type")} & {"qwen4_exp", "qwen4_exp_text"}:
+            from .checkpoint import inspect_checkpoint
+            if inspect_checkpoint(_local_checkpoint(model))["mtp_layers"]:
+                raise ValueError("Qwen3.8 native model export does not retain stored MTP weights; "
+                                 "use export_mode='checkpoint' (or 'auto')")
         return None
     if export_mode == "auto" and not _needs_checkpoint_backend(_raw_config(model)):
         return None

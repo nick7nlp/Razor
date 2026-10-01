@@ -9,9 +9,11 @@ from .base import MoEAdapter, MoEContext, RouterSpec, register
 class QwenMoEAdapter(MoEAdapter):
     """Softmax routing with optional selected-weight normalization."""
     MODEL_TYPES = ("qwen2_moe", "qwen3_moe", "qwen3_next", "qwen3_5_moe",
-                   "qwen3_5_moe_text", "qwen3_6_moe", "qwen3_6_moe_text")
+                   "qwen3_5_moe_text", "qwen3_6_moe", "qwen3_6_moe_text",
+                   "qwen4_exp", "qwen4_exp_text")
     BLOCK_CLASSES = ("Qwen2MoeSparseMoeBlock", "Qwen3MoeSparseMoeBlock",
-                     "Qwen3NextSparseMoeBlock", "Qwen3_5MoeSparseMoeBlock")
+                     "Qwen3NextSparseMoeBlock", "Qwen3_5MoeSparseMoeBlock",
+                     "Qwen4ExpTextSparseMoeBlock")
     CONFIG_NUM_EXPERTS = ("num_experts", "num_local_experts", "n_routed_experts")
     CONFIG_TOP_K = ("num_experts_per_tok", "top_k")
 

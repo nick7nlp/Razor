@@ -107,6 +107,10 @@ class CheckpointWeights:
         if self.quant is None:
             self.quant = quantization_config(model.config)
         self.slots = dict(model.state_dict())
+        cpu_suffixes = {suffix for module in model.modules()
+                        for suffix in (getattr(module, "_no_placement_params", None) or ())}
+        self.cpu_slots = {name for name in self.slots
+                          if any(name.endswith(suffix) for suffix in cpu_suffixes)}
         aliases = defaultdict(list)
         for name, parameter in model.named_parameters(remove_duplicate=False):
             aliases[id(parameter)].append(name)
@@ -222,6 +226,7 @@ class CheckpointWeights:
         return {target: result}
 
     def converted(self, target, device):
+        device = "cpu" if target in self.cpu_slots else device
         entries = self.groups[target]
         rule = self.rules.get(target)
         dtype = self.slots[target].dtype
@@ -229,14 +234,16 @@ class CheckpointWeights:
             if len(entries) != 1:
                 raise ValueError(f"multiple unconverted sources for {target}")
             return {target: self.tensor(entries[0][0], device, dtype=dtype)}
-        merged = self._merged(target, entries, rule, device)
-        if merged is not None:
-            return merged
-        conversion = copy.deepcopy(rule)
-        for source, pattern in entries:
-            conversion.add_tensor(target, source, pattern,
-                                  lambda source=source: self.tensor(source, device, dtype=dtype))
-        return conversion.convert(target, model=self.model, config=self.model.config)
+        conversion_device = "cpu" if getattr(rule, "force_cpu", False) else device
+        result = self._merged(target, entries, rule, conversion_device)
+        if result is None:
+            conversion = copy.deepcopy(rule)
+            for source, pattern in entries:
+                conversion.add_tensor(target, source, pattern,
+                                      lambda source=source: self.tensor(source, conversion_device, dtype=dtype))
+            result = conversion.convert(target, model=self.model, config=self.model.config)
+        return {name: ([item.to(device) for item in value] if isinstance(value, list) else value.to(device))
+                for name, value in result.items()}
 
     def _tied(self, name, device):
         """Resolve a tied slot from a resident alias or from the alias source itself.
@@ -247,6 +254,7 @@ class CheckpointWeights:
         conversion mapped to the alias is read, so resolution no longer depends
         on the order in which prefixes are requested.
         """
+        device = "cpu" if name in self.cpu_slots else device
         aliases = self.aliases.get(name, ())
         for alias in aliases:
             value = self.model.get_parameter(alias)

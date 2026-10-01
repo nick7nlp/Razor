@@ -216,7 +216,10 @@ def _auto_model(method: str, model=None, **kwargs):
         if is_kimi and kwargs.get("trust_remote_code", False) and list(Path(root).glob("modeling_kimi*.py")):
             return local_model()
         failure = None
-        for auto_class in (AutoModelForCausalLM, AutoModelForImageTextToText):
+        auto_classes = ((AutoModelForImageTextToText,)
+                        if getattr(config, "model_type", None) == "qwen4_exp"
+                        else (AutoModelForCausalLM, AutoModelForImageTextToText))
+        for auto_class in auto_classes:
             try:
                 return finish(getattr(auto_class, method)(argument, **kwargs))
             except ValueError as error:

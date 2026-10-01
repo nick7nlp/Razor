@@ -171,7 +171,7 @@ class MoEAdapter:
         if main is None:
             raise AttributeError("cannot locate decoder layers")
         yield "main", main.layers
-        for holder in (inner, main):
+        for holder in holders:
             for name in ("mtp_layers", "mtp"):
                 mtp = getattr(holder, name, None)
                 if mtp is not None:

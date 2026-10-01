@@ -14,6 +14,7 @@ release or inference runtime.
 | GLM-5.2 | `glm_moe_dsa` | `glm` | DSA state is carried through the native decoder forward |
 | GLM-5.3 | `glm5_next`, `glm5_next_text` | `glm` | Conditional/text wrapper, native mHC/KDA/DSA control flow, FP8 weights and scales |
 | Qwen3.5 / Qwen3.6 MoE | `qwen3_5_moe`, `qwen3_5_moe_text`, `qwen3_6_moe`, `qwen3_6_moe_text` | `qwen` | Text/conditional wrappers, fused expert tensors, unchanged shared expert and vision weights |
+| Qwen3.8 Flash Next | `qwen4_exp`, `qwen4_exp_text` | `qwen` | Native conditional/text classes, fused experts, HC, PLE/ngram and QSA; independent `mtp_N` keep sets |
 | Gemma 4 MoE | `gemma4`, `gemma4_text` | `gemma4` | Decoder-level router, normalized expert inputs and per-expert output gain |
 | Kimi K3 / Kimi Linear | `kimi_k3`, `kimi_linear` | `kimi` | Native gate and activation; latent expert inputs; packed expert weights and scales |
 
@@ -29,8 +30,30 @@ particular evaluation. `generic` remains an explicit opt-in for custom layouts.
 Forward collection requires the architecture's native implementation in the
 installed Transformers distribution or in the checkpoint's Python files.
 Missing implementations must be installed or supplied; Razor does not substitute
-a different model architecture. GLM-5.3 and Kimi model classes may not be
-present in the base Transformers installation.
+a different model architecture. GLM-5.3, Qwen3.8 and Kimi model classes may not be
+present in the base Transformers installation. Qwen3.8 Flash Next uses
+`qwen4_exp`, tested with Transformers 5.16.1. Its conditional wrapper is loaded
+as a conditional model rather than silently reduced to a causal text model.
+The native implementation may select installed CUDA-only FLA/causal-conv
+kernels even for CPU tensors; use a compatible device/runtime. Its QSA indexer
+remains native when query attention is chunked; this is not a bound on every
+indexer or PLE allocation. Streaming honors native `force_cpu` conversion
+rules and keeps `_no_placement_params` (including the large n-gram table) on
+CPU; the native embedding moves only lookup indices and results across devices.
+This still requires host RAM for the table and its conversion buffers.
+Qwen3.8 checkpoints containing stored MTP layers must use `--export-mode auto`
+or `checkpoint`: `model` export is rejected before loading, because the native
+model class does not instantiate those MTP weights.
+
+`tests/test_qwen38.py` exercises a native tiny model with PLE/ngram, HC, linear
+attention and QSA enabled: FP32/BF16 routing and refill, two streaming windows,
+chunked attention and export/reload logits. Set `RAZOR_QWEN38_TEST_DEVICE` to a
+free CUDA device when the installed optional kernels require CUDA. Native tests
+skip when the implementation or a compatible device is unavailable; skips are
+not validation. Raw-storage/MTP tests do not require the native implementation.
+These checks do not certify full-size multimodal quality or MTP speculative
+execution. Qwen3.8 weights inherit their own Qwen Community License 1.0, not
+the Apache-2.0 license of Qwen3.6.
 
 `trust_remote_code=False` is the default. Review checkpoint code before enabling
 `--trust-remote-code`. It permits native classes, relative imports and an official

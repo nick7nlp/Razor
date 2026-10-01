@@ -194,7 +194,7 @@ def _family(config, keys):
         "kimi": {"kimi_k3", "kimi_linear"},
         "glm": {"glm4_moe", "glm4_moe_lite", "glm_moe_dsa", "glm5_next", "glm5_next_text"},
         "qwen": {"qwen2_moe", "qwen3_moe", "qwen3_next", "qwen3_5_moe", "qwen3_5_moe_text",
-                 "qwen3_6_moe", "qwen3_6_moe_text"},
+                 "qwen3_6_moe", "qwen3_6_moe_text", "qwen4_exp", "qwen4_exp_text"},
     }
     declared_types = {value for value in (config.get("model_type"), text.get("model_type")) if value}
     matches = {family for family, names in model_types.items() if declared_types & names}
@@ -211,7 +211,8 @@ def _family(config, keys):
                 "Glm5NextForConditionalGeneration", "Glm5NextForCausalLM"},
         "qwen": {"Qwen2MoeForCausalLM", "Qwen3MoeForCausalLM", "Qwen3NextForCausalLM",
                  "Qwen3_5MoeForConditionalGeneration", "Qwen3_5MoeForCausalLM",
-                 "Qwen3_6MoeForConditionalGeneration", "Qwen3_6MoeForCausalLM"},
+                 "Qwen3_6MoeForConditionalGeneration", "Qwen3_6MoeForCausalLM",
+                 "Qwen4ExpForConditionalGeneration", "Qwen4ExpForCausalLM"},
     }
     declared_arch = set(config.get("architectures") or []) | set(text.get("architectures") or [])
     matches = {family for family, names in architectures.items() if declared_arch & names}
